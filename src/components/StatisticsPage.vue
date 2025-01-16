@@ -14,6 +14,9 @@
             <span class="font-semibold text-lg">{{ task.name }}</span>
             <span class="font-semibold text-lg">Загальний час: {{ formatTime(calculateElapsedTimeForDate(task.intervals, selectedDate)) }}</span>
           </div>
+          <div class="text-sm text-gray-600 mb-4">
+            Проєкт: {{ getProjectName(task.projectId) }}
+          </div>
           <ul class="mt-2 space-y-2">
             <li v-for="interval in task.intervals" :key="interval.startAt" class="text-sm text-gray-600 font-bold flex justify-between">
               <span>Тривалість: {{ formatTime(moment(interval.endAt).diff(moment(interval.startAt), "seconds")) }}</span>
@@ -42,6 +45,13 @@ const selectedDate = ref(moment().format("YYYY-MM-DD"));
 const currentDate = ref(moment().format("YYYY-MM-DD"));
 const router = useRouter();
 let interval = null;
+
+const projects = ref(JSON.parse(localStorage.getItem("projects")) || []);
+
+const getProjectName = (projectId) => {
+  const project = projects.value.find(project => project.id === projectId);
+  return project ? project.name : 'Без проєкту';
+};
 
 const filterIntervalsForDate = (intervals, date) => {
   const selectedDateStart = moment(date).startOf("day");
