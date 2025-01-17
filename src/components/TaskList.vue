@@ -10,7 +10,7 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-200">
-        <tr v-for="(task, index) in tasks" :key="task.id">
+        <tr v-for="(task, index) in filteredTasks" :key="task.id">
           <td class="px-6 py-4 text-sm font-semibold text-gray-800">
             <span class="cursor-pointer hover:text-teal-600 hover:underline" @click="editTask(task.id)">{{ task.name }}</span>
           </td>
@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import { defineProps, defineEmits, computed } from 'vue';
 
 const props = defineProps({
   tasks: Array,
@@ -38,6 +38,12 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['editTask', 'continueTask', 'deleteTask']);
+
+const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+const filteredTasks = computed(() => {
+  return props.tasks.filter(task => task.userId === currentUser.username);
+});
 
 const editTask = (id) => {
   emit('editTask', id);

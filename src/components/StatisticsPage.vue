@@ -26,8 +26,7 @@
         </li>
       </ul>
     </div>
-    <button
-      class="mt-6 w-full px-6 py-3 bg-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl transition duration-300 font-semibold"
+    <button class="mt-6 w-full px-6 py-3 bg-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl transition duration-300 font-semibold"
       @click="goBack">
       Назад
     </button>
@@ -40,13 +39,20 @@ import Highcharts from "highcharts";
 import { useRouter } from "vue-router";
 import moment from "moment";
 
-const tasks = ref(JSON.parse(localStorage.getItem("tasks")) || []);
+const currentUser = ref(JSON.parse(localStorage.getItem('currentUser')));
+
+const loadUserData = (key) => {
+  const data = JSON.parse(localStorage.getItem(key)) || {};
+  return data[currentUser.value.username] || [];
+};
+
+const tasks = ref(loadUserData("tasks"));
 const selectedDate = ref(moment().format("YYYY-MM-DD"));
 const currentDate = ref(moment().format("YYYY-MM-DD"));
 const router = useRouter();
 let interval = null;
 
-const projects = ref(JSON.parse(localStorage.getItem("projects")) || []);
+const projects = ref(loadUserData("projects"));
 
 const getProjectName = (projectId) => {
   const project = projects.value.find(project => project.id === projectId);
@@ -100,6 +106,7 @@ const calculateElapsedTimeForDate = (intervals, date) => {
 
 const filteredTasks = computed(() => {
   return tasks.value
+    .filter(task => task.userId === currentUser.value.username)
     .map((task) => {
       const intervals = filterIntervalsForDate(task.intervals, selectedDate.value);
       return intervals.length > 0 ? { ...task, intervals } : null;
@@ -121,14 +128,16 @@ const formatDate = (date) => {
 };
 
 const renderChart = () => {
-  const chartData = tasks.value.map((task) => ({
-    name: task.name,
-    y: task.intervals.reduce((sum, { startAt, endAt }) => {
-      const start = moment(startAt);
-      const end = endAt ? moment(endAt) : moment();
-      return sum + end.diff(start, "seconds");
-    }, 0),
-  }));
+  const chartData = tasks.value
+    .filter(task => task.userId === currentUser.value.username)
+    .map((task) => ({
+      name: task.name,
+      y: task.intervals.reduce((sum, { startAt, endAt }) => {
+        const start = moment(startAt);
+        const end = endAt ? moment(endAt) : moment();
+        return sum + end.diff(start, "seconds");
+      }, 0),
+    }));
 
   Highcharts.chart("chart-container", {
     chart: {
@@ -152,10 +161,7 @@ const goBack = () => {
 };
 
 const updateHistory = () => {
-  const newTasks = JSON.parse(localStorage.getItem("tasks")) || [];
-  if (JSON.stringify(newTasks) !== JSON.stringify(tasks.value)) {
-    tasks.value = newTasks;
-  }
+  tasks.value = loadUserData("tasks");
 };
 
 watch(selectedDate, updateHistory);

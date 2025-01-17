@@ -1,6 +1,12 @@
 <template>
   <div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-    <h1 class="text-4xl font-bold text-gray-900 text-center mb-8 tracking-wide">Персональний трекер часу</h1>
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-4xl font-bold text-gray-900 tracking-wide">Персональний трекер часу</h1>
+      <div class="flex items-center space-x-4">
+        <span class="text-lg font-semibold text-gray-700">Вітаємо, {{ currentUser.username }}</span>
+        <button @click="logout" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300">Вийти</button>
+      </div>
+    </div>
 
     <div class="mb-6">
       <ul class="flex border-b">
@@ -13,9 +19,9 @@
       </ul>
     </div>
 
-    <TaskList v-if="activeTab === 'tasks'" :tasks="tasks" :activeTaskIndex="activeTaskIndex" :getProjectName="getProjectName" :formatTime="formatTime" :calculateElapsedTime="calculateElapsedTime" @editTask="editTask" @continueTask="continueTask" @deleteTask="deleteTask" />
+    <TaskList v-if="activeTab === 'tasks'" :tasks="filteredTasks" :activeTaskIndex="activeTaskIndex" :getProjectName="getProjectName" :formatTime="formatTime" :calculateElapsedTime="calculateElapsedTime" @editTask="editTask" @continueTask="continueTask" @deleteTask="deleteTask" />
 
-    <ProjectList v-if="activeTab === 'projects'" :projects="projects" @editProject="editProject" @confirmDeleteProject="confirmDeleteProject" />
+    <ProjectList v-if="activeTab === 'projects'" :projects="filteredProjects" @editProject="editProject" @confirmDeleteProject="confirmDeleteProject" />
 
     <button v-if="activeTab === 'tasks'" class="mt-6 w-full px-6 py-3 bg-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl transition duration-300 font-semibold" @click="showModal = true">Почати нову задачу</button>
 
@@ -33,7 +39,7 @@
         <input v-model="newTaskName" type="text" placeholder="Назва задачі" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6 text-gray-900 font-medium"/>
         <label for="project-select" class="block text-sm font-medium text-gray-700">Виберіть проєкт:</label>
         <select id="project-select" v-model="selectedProjectId" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-          <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.name }}</option>
+          <option v-for="project in filteredProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
         </select>
         <div class="flex gap-6 justify-between mt-6">
           <button class="w-1/2 px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition duration-300 font-semibold" @click="startNewTask" :disabled="!newTaskName">Почати</button>
@@ -48,7 +54,7 @@
         <input v-model="taskToEdit.name" type="text" placeholder="Назва задачі" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6 text-gray-900 font-medium"/>
         <label for="project-select-edit" class="block text-sm font-medium text-gray-700">Виберіть проєкт:</label>
         <select id="project-select-edit" v-model="taskToEdit.projectId" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-          <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.name }}</option>
+          <option v-for="project in filteredProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
         </select>
         <div class="flex gap-6 justify-between mt-6">
           <button class="w-1/2 px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition duration-300 font-semibold" @click="saveEditedTask" :disabled="!taskToEdit.name">Зберегти</button>
@@ -73,7 +79,7 @@
         <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Додати запис часу</h2>
         <label for="task-select" class="block text-sm font-medium text-gray-700">Виберіть задачу:</label>
         <select id="task-select" v-model="selectedTaskId" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-          <option v-for="task in tasks" :key="task.id" :value="task.id">{{ task.name }}</option>
+          <option v-for="task in filteredTasks" :key="task.id" :value="task.id">{{ task.name }}</option>
         </select>
         <label for="start-time" class="block text-sm font-medium text-gray-700 mt-4">Час початку:</label>
         <input type="datetime-local" id="start-time" v-model="startTime" :max="currentDateTime" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
@@ -93,7 +99,7 @@
         <input v-model="newTaskName" type="text" placeholder="Назва задачі" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6 text-gray-900 font-medium"/>
         <label for="project-select" class="block text-sm font-medium text-gray-700">Виберіть проєкт:</label>
         <select id="project-select" v-model="selectedProjectId" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-          <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.name }}</option>
+          <option v-for="project in filteredProjects" :key="project.id" :value="project.id">{{ project.name }}</option>
         </select>
         <label for="start-time-new" class="block text-sm font-medium text-gray-700 mt-4">Час початку:</label>
         <input type="datetime-local" id="start-time-new" v-model="startTime" :max="currentDateTime" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
@@ -201,8 +207,21 @@ import { useRouter } from "vue-router";
 import TaskList from "./TaskList.vue";
 import ProjectList from "./ProjectList.vue";
 
-const tasks = ref(JSON.parse(localStorage.getItem("tasks")) || []);
-const projects = ref(JSON.parse(localStorage.getItem("projects")) || []);
+const currentUser = ref(JSON.parse(localStorage.getItem('currentUser')));
+
+const loadUserData = (key) => {
+  const data = JSON.parse(localStorage.getItem(key)) || {};
+  return data[currentUser.value.username] || [];
+};
+
+const saveUserData = (key, data) => {
+  const allData = JSON.parse(localStorage.getItem(key)) || {};
+  allData[currentUser.value.username] = data;
+  localStorage.setItem(key, JSON.stringify(allData));
+};
+
+const tasks = ref(loadUserData("tasks"));
+const projects = ref(loadUserData("projects"));
 const newTaskName = ref("");
 const newProjectName = ref("");
 const taskToEdit = ref({});
@@ -230,12 +249,17 @@ let interval = null;
 const router = useRouter();
 const activeTab = ref("tasks");
 
+const logout = () => {
+  localStorage.removeItem('currentUser');
+  router.push('/login');
+};
+
 const saveTasks = () => {
-  localStorage.setItem("tasks", JSON.stringify(tasks.value));
+  saveUserData("tasks", tasks.value);
 };
 
 const saveProjects = () => {
-  localStorage.setItem("projects", JSON.stringify(projects.value));
+  saveUserData("projects", projects.value);
 };
 
 const calculateElapsedTime = (intervals) => {
@@ -302,6 +326,7 @@ const startNewTask = () => {
     name: newTaskName.value,
     projectId: selectedProjectId.value,
     intervals: [{ startAt: moment().toISOString(), endAt: null }],
+    userId: currentUser.value.username
   };
   tasks.value.push(newTask);
   activeTaskIndex.value = tasks.value.length - 1;
@@ -328,6 +353,7 @@ const addNewTaskWithTime = () => {
         endAt: moment(endTime.value).toISOString(),
       },
     ],
+    userId: currentUser.value.username
   };
   tasks.value.push(newTask);
   newTaskName.value = "";
@@ -458,7 +484,7 @@ const createProject = () => {
     showDuplicateProjectModal.value = true;
     return;
   }
-  const newProject = { id: Date.now(), name: newProjectName.value };
+  const newProject = { id: Date.now(), name: newProjectName.value, userId: currentUser.value.username };
   projects.value.push(newProject);
   newProjectName.value = "";
   showProjectModal.value = false;
@@ -524,6 +550,14 @@ const getProjectName = (projectId) => {
   return project ? project.name : 'Без проєкту';
 };
 
+const filteredTasks = computed(() => {
+  return tasks.value.filter(task => task.userId === currentUser.value.username);
+});
+
+const filteredProjects = computed(() => {
+  return projects.value.filter(project => project.userId === currentUser.value.username);
+});
+
 watch(activeTaskIndex, (newIndex) => {
   if (newIndex !== null) {
     startTimer();
@@ -547,5 +581,7 @@ onMounted(() => {
     timer.value = calculateElapsedTime(activeTask.intervals);
     startTimer();
   }
+  tasks.value = loadUserData("tasks");
+  projects.value = loadUserData("projects");
 });
 </script>
