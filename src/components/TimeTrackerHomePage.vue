@@ -1,7 +1,7 @@
 <template>
-  <div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-4xl font-bold text-gray-900 tracking-wide">Персональний трекер часу</h1>
+  <div class="max-w-4xl mx-auto mt-10 p-4 sm:p-6 bg-white shadow-lg rounded-lg">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 tracking-wide mb-4 sm:mb-0 text-center sm:text-left">Персональний трекер часу</h1>
       <div class="flex items-center space-x-4">
         <span class="text-lg font-semibold text-gray-700">Вітаємо, {{ currentUser.username }}</span>
         <button @click="logout" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300">Вийти</button>
@@ -34,7 +34,7 @@
     <button v-if="activeTab === 'projects'" class="mt-6 w-full px-6 py-3 bg-yellow-600 text-white rounded-lg shadow-lg hover:shadow-xl transition duration-300 font-semibold" @click="showProjectModal = true">Створити новий проєкт</button>
 
     <div v-if="showModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
-      <div class="bg-white p-8 rounded-lg shadow-xl w-1/3 scale-95 opacity-0 animate-modal">
+      <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg scale-95 opacity-0 animate-modal">
         <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Нова задача</h2>
         <input v-model="newTaskName" type="text" placeholder="Назва задачі" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6 text-gray-900 font-medium"/>
         <label for="project-select" class="block text-sm font-medium text-gray-700">Виберіть проєкт:</label>
@@ -49,7 +49,7 @@
     </div>
 
     <div v-if="editModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
-      <div class="bg-white p-8 rounded-lg shadow-xl w-1/3 scale-95 opacity-0 animate-modal">
+      <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg scale-95 opacity-0 animate-modal">
         <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Редагувати задачу</h2>
         <input v-model="taskToEdit.name" type="text" placeholder="Назва задачі" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6 text-gray-900 font-medium"/>
         <label for="project-select-edit" class="block text-sm font-medium text-gray-700">Виберіть проєкт:</label>
@@ -64,7 +64,7 @@
     </div>
 
     <div v-if="showDeleteModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
-      <div class="bg-white p-8 rounded-lg shadow-xl w-1/3 scale-95 opacity-0 animate-modal">
+      <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg scale-95 opacity-0 animate-modal">
         <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Підтвердження видалення</h2>
         <p class="text-gray-700 mb-6 text-center">Ви впевнені, що хочете видалити цю задачу?</p>
         <div class="flex gap-6 justify-between">
@@ -75,7 +75,7 @@
     </div>
 
     <div v-if="showAddTimeModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
-      <div class="bg-white p-8 rounded-lg shadow-xl w-1/3 scale-95 opacity-0 animate-modal">
+      <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg scale-95 opacity-0 animate-modal">
         <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Додати запис часу</h2>
         <label for="task-select" class="block text-sm font-medium text-gray-700">Виберіть задачу:</label>
         <select id="task-select" v-model="selectedTaskId" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -94,7 +94,7 @@
     </div>
 
     <div v-if="showNewTaskWithTimeModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
-      <div class="bg-white p-8 rounded-lg shadow-xl w-1/3 scale-95 opacity-0 animate-modal">
+      <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg scale-95 opacity-0 animate-modal">
         <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Нова задача з записом часу</h2>
         <input v-model="newTaskName" type="text" placeholder="Назва задачі" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6 text-gray-900 font-medium"/>
         <label for="project-select" class="block text-sm font-medium text-gray-700">Виберіть проєкт:</label>
@@ -114,7 +114,7 @@
     </div>
 
     <div v-if="showDuplicateTaskModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
-      <div class="bg-white p-8 rounded-lg shadow-xl w-1/3 scale-95 opacity-0 animate-modal">
+      <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg scale-95 opacity-0 animate-modal">
         <h2 class="text-2xl font-bold text-red-600 mb-6 text-center">Помилка</h2>
         <p class="text-center font-bold text-gray-700 mb-6">Задача з такою назвою вже існує</p>
         <div class="flex gap-6 justify-center">
@@ -124,7 +124,7 @@
     </div>
 
     <div v-if="showProjectModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
-      <div class="bg-white p-8 rounded-lg shadow-xl w-1/3 scale-95 opacity-0 animate-modal">
+      <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg scale-95 opacity-0 animate-modal">
         <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Новий проєкт</h2>
         <input v-model="newProjectName" type="text" placeholder="Назва проєкту" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6 text-gray-900 font-medium"/>
         <div class="flex gap-6 justify-between">
@@ -135,7 +135,7 @@
     </div>
 
     <div v-if="editProjectModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
-      <div class="bg-white p-8 rounded-lg shadow-xl w-1/3 scale-95 opacity-0 animate-modal">
+      <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg scale-95 opacity-0 animate-modal">
         <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Редагувати проєкт</h2>
         <input v-model="projectToEdit.name" type="text" placeholder="Назва проєкту" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6 text-gray-900 font-medium"/>
         <div class="flex gap-6 justify-between">
@@ -146,7 +146,7 @@
     </div>
 
     <div v-if="showDeleteProjectModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
-      <div class="bg-white p-8 rounded-lg shadow-xl w-1/3 scale-95 opacity-0 animate-modal">
+      <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg scale-95 opacity-0 animate-modal">
         <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Підтвердження видалення</h2>
         <p class="text-gray-700 mb-6 text-center">Ви впевнені, що хочете видалити цей проєкт?</p>
         <div class="flex gap-6 justify-between">
@@ -157,7 +157,7 @@
     </div>
 
     <div v-if="showDuplicateProjectModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
-      <div class="bg-white p-8 rounded-lg shadow-xl w-1/3 scale-95 opacity-0 animate-modal">
+      <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg scale-95 opacity-0 animate-modal">
         <h2 class="text-2xl font-bold text-red-600 mb-6 text-center">Помилка</h2>
         <p class="text-center font-bold text-gray-700 mb-6">Проєкт з такою назвою вже існує</p>
         <div class="flex gap-6 justify-center">
@@ -206,17 +206,20 @@ import moment from "moment";
 import { useRouter } from "vue-router";
 import TaskList from "./TaskList.vue";
 import ProjectList from "./ProjectList.vue";
+import { encryptData, decryptData } from "../utils/crypto";
 
 const currentUser = ref(JSON.parse(localStorage.getItem('currentUser')));
+currentUser.value.username = decryptData(currentUser.value.username);
 
 const loadUserData = (key) => {
   const data = JSON.parse(localStorage.getItem(key)) || {};
-  return data[currentUser.value.username] || [];
+  const encryptedData = data[currentUser.value.username] || [];
+  return encryptedData.map(item => JSON.parse(decryptData(item)));
 };
 
 const saveUserData = (key, data) => {
   const allData = JSON.parse(localStorage.getItem(key)) || {};
-  allData[currentUser.value.username] = data;
+  allData[currentUser.value.username] = data.map(item => encryptData(JSON.stringify(item)));
   localStorage.setItem(key, JSON.stringify(allData));
 };
 
@@ -451,6 +454,9 @@ const addTimeEntry = () => {
   }
   const task = tasks.value.find((task) => task.id === selectedTaskId.value);
   if (task) {
+    if (activeTaskIndex.value !== null && tasks.value[activeTaskIndex.value].id === selectedTaskId.value) {
+      finishTask();
+    }
     task.intervals.push({
       startAt: moment(startTime.value).toISOString(),
       endAt: moment(endTime.value).toISOString(),
@@ -561,7 +567,8 @@ const filteredProjects = computed(() => {
 watch(activeTaskIndex, (newIndex) => {
   if (newIndex !== null) {
     startTimer();
-  } else {
+  }
+  else {
     stopTimer();
   }
   saveTimerState();

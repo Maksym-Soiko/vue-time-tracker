@@ -10,9 +10,9 @@
       <h2 class="text-2xl font-bold text-gray-900 mb-4">Історія за {{ formatDate(selectedDate) }}</h2>
       <ul class="space-y-4">
         <li v-for="task in filteredTasks" :key="task.id" class="bg-white p-4 rounded-lg shadow-md">
-          <div class="flex justify-between items-center mb-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
             <span class="font-semibold text-lg">{{ task.name }}</span>
-            <span class="font-semibold text-lg">Загальний час: {{ formatTime(calculateElapsedTimeForDate(task.intervals, selectedDate)) }}</span>
+            <span class="font-semibold text-lg mt-2 sm:mt-0">Загальний час: {{ formatTime(calculateElapsedTimeForDate(task.intervals, selectedDate)) }}</span>
           </div>
           <div class="text-sm text-gray-600 mb-4">
             Проєкт: {{ getProjectName(task.projectId) }}
@@ -38,12 +38,15 @@ import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import Highcharts from "highcharts";
 import { useRouter } from "vue-router";
 import moment from "moment";
+import { decryptData } from "../utils/crypto";
 
 const currentUser = ref(JSON.parse(localStorage.getItem('currentUser')));
+currentUser.value.username = decryptData(currentUser.value.username);
 
 const loadUserData = (key) => {
   const data = JSON.parse(localStorage.getItem(key)) || {};
-  return data[currentUser.value.username] || [];
+  const encryptedData = data[currentUser.value.username] || [];
+  return encryptedData.map(item => JSON.parse(decryptData(item)));
 };
 
 const tasks = ref(loadUserData("tasks"));
